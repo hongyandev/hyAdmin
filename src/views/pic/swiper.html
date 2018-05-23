@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="../../../start/layui/css/layui.css">
 <title>轮播图</title>
 <div class="layui-fluid">
     <div class="layui-row layui-col-space15">
@@ -5,10 +6,10 @@
             <div class="layui-card">
                 <div class="layui-card-header">轮播图</div>
                 <div class="layui-card-body" pad15>
-                    <div  class="layui-upload-drag" id="test10">
+                    <a href="http://localhost:63342/hyadmin/src/views/pic/picAdd.html"  class="layui-upload-drag" id="test10">
                         <i class="layui-icon"></i>
                         <p>点击上传</p>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -17,13 +18,5 @@
 
 <script>
     layui.use('set', layui.factory('set'));
-    $("#test10").on("click",function () {
-        alert(1)
-        layer.open({
-            title: '新增轮播图',
-            resize:true,
-            content: 'dhfsfj'
-        });
-    });
 
 </script>

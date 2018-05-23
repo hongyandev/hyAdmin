@@ -8,15 +8,18 @@
       "title": "控制台"
       ,"jump": "/"
     }]
-  },  {
+  },{
     "name": "pic"
     ,"title": "轮播图"
-    ,"icon": "layui-icon-auz"
+    ,"icon":"layui-icon-auz"
+    ,"spread": true
     ,"list": [{
-        "title": "轮播图",
-        "jump": "pic/swiper"
+        "name": ""
+        ,"title": "轮播图"
+        ,"jump": "/iframe/link/pSwiper"
     }]
-  },{
+}
+,{
     "name": "set"
     ,"title": "设置"
     ,"icon": "layui-icon-set"

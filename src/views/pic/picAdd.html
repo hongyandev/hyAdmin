@@ -1,24 +1,234 @@
-<link rel="stylesheet" href="../../../start/layui/css/layui.css">
-<div class="layui-fluid">
-    <div class="layui-row layui-col-space15">
-        <div class="layui-col-md12">
-            <div class="layui-card">
-                <div class="layui-card-header">轮播图</div>
-                <div class="layui-card-body" pad15>
-                gsdteyfsfgjsdg
-                </div>
+<!DOCTYPE>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <link rel="stylesheet" href="../../../start/layui/css/layui.css">
+    <script>
+        var abc="homepage";
+    </script>
+    <script src="../../../start/layui/lay/ueditor/ueditor.config.js"></script>
+    <script src="../../../start/layui/lay/ueditor/ueditor.all.js"></script>
+    <script src="../../../start/layui/lay/ueditor/lang/zh-cn/zh-cn.js"></script>
+    <script src="../../../start/layui/lay/modules/jquery-2.1.4.js"></script>
+    <script src="../../../start/layui/config_admin.js"></script>
+    <script src="../../../start/layui/layui.js"></script>
+    <style>
+        .layuiImg{
+            padding:10px;
+        }
+        .layuiImg img{
+            width:100%;
+        }
+    </style>
+
+
+</head>
+<body>
+<form style="margin-top:10px;" class="layui-form" lay-filter="component-form-element" action="">
+    <div style="float:left;width:65%;background: #fff;padding:10px 2%">
+        <div style="margin-bottom:10px;">
+            <input id="title" type="text" name="title" required lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+        </div>
+         <script id="editor" type="text/plain" style="width:100%;height:300px;"></script>
+    </div>
+    <div style="float:right;width:30%;margin-left:1%;padding-top:10px;background-color: #fff">
+        <div class="layui-form-item">
+            <div class="layuiImg"><input type="hidden" name="imgid" id="imgId" value=""/><img class="imgview" /></div>
+            <label class="layui-form-label">上传图片</label>
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn" id="uploadImg">
+                    <i class="layui-icon">&#xe67c;</i>上传图片
+                </button>
+                <p class="layui-word-aux">建议尺寸：720*240</p>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">排序</label>
+            <div style="width:35%" class="layui-input-block">
+                <select id="order" name="interest" >
+                    <option value="">请选择排序级别</option>
+                    <option value="0">A</option>
+                    <option value="1">B</option>
+                    <option value="2">C</option>
+                    <option value="3">D</option>
+                    <option value="4">E</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否启用</label>
+            <div class="layui-input-block">
+                <input id="state" type="checkbox" name="state" lay-skin="switch" lay-text="启用|禁用">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button id="submit" class="layui-btn" lay-submit lay-filter="test">立即提交</button>
+                <a class="layui-btn layui-btn-primary" href="http://localhost:63342/hyadmin/src/views/pic/swiper.html">返回</a>
+
             </div>
         </div>
     </div>
-</div>
-
+</form>
 <script>
-console
-    /*setInterval(aa,2000);
-    function aa() {
-        //alert(11);
-        window.history.go(-1)
-
-    }*/
+    var ue = UE.getEditor('editor', {
+        toolbars: [
+            ['anchor', //锚点
+                'undo', //撤销
+                'redo', //重做
+                'bold', //加粗
+                'indent', //首行缩进
+                'italic', //斜体
+                'formatmatch', //格式刷
+                'source', //源代码
+                'unlink', //取消链接
+                'inserttitle', //插入标题
+                'cleardoc', //清空文档
+                'fontfamily', //字体
+                'fontsize', //字号
+                'paragraph', //段落格式
+                //'simpleupload', //单图上传
+                'insertimage', //多图上传
+                'attachment', //附件
+                'link', //超链接
+                'justifyleft', //居左对齐
+                'justifyright', //居右对齐
+                'justifycenter', //居中对齐
+                'justifyjustify', //两端对齐
+                'forecolor', //字体颜色
+                'backcolor', //背景色
+                'fullscreen', //全屏
+                'imagenone', //默认
+                'imageleft', //左浮动
+                'imageright', //右浮动
+                'imagecenter', //居中
+                'edittip ', //编辑提示
+                'customstyle', //自定义标题
+                'autotypeset', //自动排版
+                'background', //背景
+            ]
+        ],
+        autoHeightEnabled: true,
+        autoFloatEnabled: true
+    });
 
 </script>
+        <script>
+            layui.use(['jquery','form','upload'], function(){
+                var $ = layui.$,
+                    form = layui.form;
+                var  upload = layui.upload;
+                $(function () {
+                    function getQueryString(name){
+                        var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+                        var r = window.location.search.substr(1).match(reg);
+                        if(r!=null) return unescape(r[2]);return null;
+                    }
+                    var id = (getQueryString('id')!=null ? getQueryString('id') : null);
+                    $.ajax({
+                        type:"get",
+                        url:genAPI('wxDev/homepage/getHomeImageById?id='+id),
+                        //url:"http://wxdev.hongyancloud.com/wxDev/homepage/getHomeImageById?id="+id,
+                        dataType: "json",
+                        success: function(res) {
+                            if(res.code == "00000") {
+                               $("#title").val(res.data.title);
+                                UE.getEditor('editor').execCommand('insertHtml', res.data.content);
+                                $(".imgview").attr("src",res.data.fileRealPath+'?v='+Math.random());
+                                $("#imgId").val(res.data.id);
+                                $("#order").val(res.data.order);
+                                form.render('select');
+                                $("#state").val(res.data.active);
+                                if($("#state").val() == "on"){
+                                    $("#state").attr("checked",true);
+                                }else{
+                                    $("#state").attr("checked",false);
+                                }
+                                form.render('checkbox');
+
+                            }
+                        }, error: function(XMLHttpRequest, textStatus, errorThrown) {
+
+                        }
+                    });
+                });
+                //上传图片
+                upload.render({
+                    elem: '#uploadImg',
+                    url:genAPI('wxDev/homepage/saveHomeImage'),
+                    //url: 'http://wxdev.hongyancloud.com/wxDev/homepage/saveHomeImage',
+                    method:'post',
+                    filed:'file',
+                    size:600,
+                    data:{"id": function(){
+                            return $('#imgId').val();
+                        }},
+                    before: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+                        layer.msg('图片上传中...', {
+                            icon: 16,
+                            shade: 0.01
+                        })
+                    },
+                    done: function(res, index, upload){
+                        if(res.code==00000){
+                            console.info(res);
+                            layer.close(layer.msg('上传成功！'));
+                            $(".imgview").attr("src",res.data.fileRealPath+'?v='+Math.random());
+                            $("#imgId").val(res.data.id)
+                        }
+
+                    },
+                    error: function(index, upload){
+                        layer.closeAll('loading'); //关闭loading
+                    }
+                });
+                //提交
+                form.on('submit(test)', function(data){
+                    // console.log(data)
+                    var title = data.field.title,
+                        imgid = data.field.imgid;
+                        content = UE.getEditor('editor').getContent(),
+                        active = data.field.state,
+                        order = parseInt(data.field.interest);
+                    //自定义验证规则
+                    form.verify({
+                        title: function(value){
+                            if(value.length < 64){
+                                return '标题不得超过64个字符啊';
+                            }
+                        }
+                    });
+                    $.ajax({
+                        type:"post",
+                        url:genAPI('wxDev/homepage/saveHomeContent'),
+                        //url:"http://wxdev.hongyancloud.com/wxDev/homepage/saveHomeContent",
+                        data:{
+                            "id":imgid,
+                            "title":title,
+                            "content":content,
+                            "active":active,
+                            "order":order
+                        },
+                        //contentType: "application/json",
+                        dataType: "json",
+                        success: function(res) {
+                            if(res.code == "00000") {
+                                window.location.href="http://localhost:63342/hyadmin/src/views/pic/swiper.html"
+
+                            }
+                        }, error: function(XMLHttpRequest, textStatus, errorThrown) {
+
+                        }
+                    });
+                    return false;
+                });
+
+                $("#goBack").click(function () {
+                   // window.location.href="http://localhost:63342/hyadmin/src/views/pic/swiper.html"
+                    window.location.reload();
+                });
+            });
+        </script>
+
+</body>
+</html>

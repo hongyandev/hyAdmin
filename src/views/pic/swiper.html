@@ -1,22 +1,73 @@
 <link rel="stylesheet" href="../../../start/layui/css/layui.css">
+<script src="../../../start/layui/config_admin.js"></script>
+<script src="../../../start/layui/layui.js"></script>
+<style>
+    .layui-col-xs4{
+        height:165px;
+        overflow: hidden;
+        text-align: center;
+    }
+    .layui-col-xs4 a{
+        display: block;
+        background-color: #fff;
+        height:100%;
+        overflow: hidden;
+    }
+    .layui-col-xs4:last-child a{
+        height:auto;
+        padding:52px 0;
+    }
+    .layui-card-body img{
+        width:100%;
+        height:87px;
+    }
+</style>
 <title>轮播图</title>
 <div class="layui-fluid">
-    <div class="layui-row layui-col-space15">
-        <div class="layui-col-md12">
-            <div class="layui-card">
-                <div class="layui-card-header">轮播图</div>
-                <div class="layui-card-body" pad15>
-                    <a href="http://localhost:63342/hyadmin/src/views/pic/picAdd.html"  class="layui-upload-drag" id="test10">
-                        <i class="layui-icon"></i>
-                        <p>点击上传</p>
-                    </a>
+                <div class="layui-card" style="margin-bottom:0">
+                    <div class="layui-card-header">轮播图</div>
+                </div>
+                <div class="layui-card-body">
+                    <div class="layui-row layui-col-space5 layContent">
+                        <div class="layui-col-xs4">
+                            <a style="" href="http://localhost:63342/hyadmin/src/views/pic/picAdd.html"  class="layui-upload-drag" id="test10">
+                                <i class="layui-icon"></i>
+                                <p>点击上传轮播图信息</p>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
 
 <script>
-    layui.use('set', layui.factory('set'));
+    layui.use(['jquery'], function(){
+        var $ = layui.$;
+
+        $.ajax({
+            type:"get",
+            url:genAPI('wxDev/homepage/getHomeImageList'),
+            //url:"http://wxdev.hongyancloud.com/wxDev/homepage/getHomeImageList",
+            dataType: "json",
+            success: function(res) {
+                if(res.code == "00000") {
+                  // console.info(111);
+                   var str="";
+                    $.each(res.data,function (i,o) {
+                        str+="<div class=\"layui-col-xs4\">\n" +
+                            "       <a href="+'http://localhost:63342/hyadmin/src/views/pic/picAdd.html?id='+o.id+" class=\"layui-card\">\n" +
+                            "            <div class=\"layui-card-header layui-elip layTitle\">"+o.title+"</div>\n" +
+                            "                 <div class=\"layui-card-body\">\n" +
+                            "                       <img src="+o.fileRealPath+" />\n" +
+                            "                   </div>\n" +
+                            "         </a>\n" +
+                            "</div>"
+                    });
+                    $(".layContent").prepend(str);
+                }
+            }, error: function(XMLHttpRequest, textStatus, errorThrown) {
+
+            }
+        });
+    })
 
 </script>

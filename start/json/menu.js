@@ -11,12 +11,32 @@
   },{
     "name": "pic"
     ,"title": "轮播图"
-    ,"icon":"layui-icon-auz"
+    ,"icon":"layui-icon-layouts"
     ,"spread": true
     ,"list": [{
         "name": ""
         ,"title": "轮播图"
         ,"jump": "/iframe/link/pSwiper"
+    }]
+},{
+    "name": "activity"
+    ,"title": "营销活动"
+    ,"icon":"layui-icon-note"
+    ,"spread": true
+    ,"list": [{
+        "name": ""
+        ,"title": "营销活动"
+        ,"jump": "/iframe/link/pMarketing"
+    }]
+},{
+    "name": "code"
+    ,"title": "兑换码管理"
+    ,"icon":"layui-icon-note"
+    ,"spread": true
+    ,"list": [{
+        "name": "codeManger"
+        ,"title": "兑换码管理"
+        ,"jump": "code/codeManger"
     }]
 }
 ,{

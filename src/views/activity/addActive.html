@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <meta charset="utf-8">
+   <title>layui</title>
+   <meta name="renderer" content="webkit">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+   <link rel="stylesheet" href="../../../start/layui/css/layui.css">
+    <script>
+        var abc="sellactivity";
+    </script>
+    <script src="../../../start/layui/lay/ueditor/ueditor.config.js"></script>
+    <script src="../../../start/layui/lay/ueditor/ueditor.all.js"></script>
+    <script src="../../../start/layui/lay/ueditor/lang/zh-cn/zh-cn.js"></script>
+    <script src="../../../start/layui/lay/modules/jquery-2.1.4.js"></script>
+    <script src="../../../start/layui/config_admin.js"></script>
+   <script src="../../../start/layui/layui.js"></script>
+    <style>
+        .layuiImg{
+            width:180px;
+            /*height:100px;*/
+        }
+        .layuiImg img{
+            width:100%;
+            margin:10px 0;
+        }
+    </style>
+
+</head>
+<body>
+<div class="layui-card">
+   <div class="layui-card-body">
+       <form class="layui-form" action="">
+           <div class="layui-form-item">
+               <label class="layui-form-label">活动标题</label>
+               <div class="layui-input-block">
+                   <input type="text" name="title" id="title" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
+               </div>
+           </div>
+           <div class="layui-form-item">
+               <label class="layui-form-label">描述</label>
+               <div class="layui-input-block">
+                   <input type="text" name="describe" lay-verify="describe" autocomplete="off" placeholder="请填写描述" class="layui-input">
+               </div>
+           </div>
+           <div class="layui-form-item">
+               <label class="layui-form-label">置顶</label>
+               <div class="layui-input-block">
+                   <input type="radio" name="formtop" value="1" title="是">
+                   <input type="radio" name="formtop" value="0" title="否" checked>
+               </div>
+           </div>
+           <div class="layui-form-item">
+               <div class="layui-inline">
+                   <label class="layui-form-label">活动日期</label>
+                   <div class="layui-input-inline">
+                       <input type="text" name="startTime" lay-verify="time" class="layui-input" id="laydate-start" placeholder="开始日期" lay-key="47">
+                   </div>
+                   <div class="layui-form-mid">
+                       -
+                   </div>
+                   <div class="layui-input-inline">
+                       <input type="text" name="endTime" lay-verify="time" class="layui-input" id="laydate-end" placeholder="结束日期" lay-key="48">
+                   </div>
+               </div>
+           </div>
+           <div class="layui-form-item">
+               <div class="layuiImg"><input type="hidden" lay-verify="file" name="imgid" id="imgId" value=""/><img class="imgview" /></div>
+               <label class="layui-form-label">上传图片</label>
+               <div class="layui-input-block">
+                   <button type="button" class="layui-btn" id="uploadImg">
+                       <i class="layui-icon">&#xe67c;</i>上传图片
+                   </button>
+                   <p class="layui-word-aux">建议尺寸：450*350</p>
+               </div>
+           </div>
+           <div class="layui-form-item layui-form-text">
+             <label class="layui-form-label">编辑内容</label>
+             <div class="layui-input-block">
+                 <script id="editor" type="text/plain" style="width:100%;height:300px;"></script>
+             </div>
+           </div>
+           <div class="layui-form-item">
+                 <label class="layui-form-label">是否启用</label>
+                 <div class="layui-input-block">
+                 <input id="state" value="1" type="checkbox" name="state" lay-skin="switch" lay-text="启用|禁用" checked/>
+                 </div>
+            </div>
+           <div class="layui-form-item">
+               <div class="layui-input-block">
+                   <button class="layui-btn" lay-submit lay-filter="formsubmit">立即提交</button>
+                   <a class="layui-btn layui-btn-primary" href="http://localhost:63342/hyadmin/src/views/activity/marketing.html">返回</a>
+               </div>
+           </div>
+       </form>
+   </div>
+</div>
+<script>
+     var ue = UE.getEditor('editor', {
+                 toolbars: [
+                     ['anchor', //锚点
+                         'undo', //撤销
+                         'redo', //重做
+                         'bold', //加粗
+                         'indent', //首行缩进
+                         'italic', //斜体
+                         'formatmatch', //格式刷
+                         'source', //源代码
+                         'unlink', //取消链接
+                         'inserttitle', //插入标题
+                         'cleardoc', //清空文档
+                         'fontfamily', //字体
+                         'fontsize', //字号
+                         'paragraph', //段落格式
+                         //'simpleupload', //单图上传
+                         'insertimage', //多图上传
+                         'attachment', //附件
+                         'link', //超链接
+                         'justifyleft', //居左对齐
+                         'justifyright', //居右对齐
+                         'justifycenter', //居中对齐
+                         'justifyjustify', //两端对齐
+                         'forecolor', //字体颜色
+                         'backcolor', //背景色
+                         'fullscreen', //全屏
+                         'imagenone', //默认
+                         'imageleft', //左浮动
+                         'imageright', //右浮动
+                         'imagecenter', //居中
+                         'edittip ', //编辑提示
+                         'customstyle', //自定义标题
+                         'autotypeset', //自动排版
+                         'background', //背景
+                     ]
+                 ],
+                 autoHeightEnabled: true,
+                 autoFloatEnabled: true
+             });
+</script>
+<script>
+    layui.use(['jquery','layer','table','laydate','form','upload'], function(){
+        var table = layui.table,
+            laydate = layui.laydate,
+            upload = layui.upload,
+            layer = layui.layer,
+            form = layui.form;
+        //上传图片
+        upload.render({
+            elem: '#uploadImg',
+            url:genAPI('wxDev/sellactivity/saveSellActivityImage'),
+            //url: 'http://wxdev.hongyancloud.com/wxDev/ueditor/saveHomeImage',
+            method:'post',
+            filed:'file',
+            size:600,
+            data:{"id": function(){
+                    return $('#imgId').val();
+                }},
+            before: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+                layer.msg('图片上传中...', {
+                    icon: 16,
+                    shade: 0.01
+                })
+            },
+            done: function(res, index, upload){
+                if(res.code==00000){
+                    console.info(res);
+                    layer.close(layer.msg('上传成功！'));
+                    $(".layuiImg").addClass("layui-input-block");
+                    $(".imgview").attr("src",res.data.fileRealPath+'?v='+Math.random());
+                    $("#imgId").val(res.data.id)
+                }
+
+            },
+            error: function(index, upload){
+                layer.closeAll('loading'); //关闭loading
+            }
+        });
+
+        //开始日期
+        var insStart = laydate.render({
+            elem: '#laydate-start'
+            ,min: 0
+            ,done: function(value, date){
+                //更新结束日期的最小日期
+                insEnd.config.min = lay.extend({}, date, {
+                    month: date.month - 1
+                });
+
+                //自动弹出结束日期的选择器
+                insEnd.config.elem[0].focus();
+            }
+        });
+        //结束日期
+        var insEnd = laydate.render({
+            elem: '#laydate-end'
+            ,min: 0
+            ,done: function(value, date){
+                //更新开始日期的最大日期
+                insStart.config.max = lay.extend({}, date, {
+                    month: date.month - 1
+                });
+            }
+        });
+        form.verify({
+            title: function(value){
+                if(value.length < 1){
+                    return '请填写标题';
+                }
+                if(value.length > 64){
+                    return '标题长度不能超过64位';
+                }
+            },
+            file: function(value){
+                if(value.length == ""){
+                    return '请上传图片';
+                }
+            },
+            time: function(value){
+                if(value.length == ""){
+                    return '请选择时间';
+                }
+            }
+        });
+        form.on('submit(formsubmit)', function(data){
+            //console.info(data.field);
+            var title = data.field.title,
+                imgid = data.field.imgid;
+                content = UE.getEditor('editor').getContent(),
+                active = data.field.state,
+                formtop = data.field.formtop,
+                describe = data.field.describe,
+                startTime = data.field.startTime,
+                endTime = data.field.endTime;
+            //自定义验证规则
+
+            $.ajax({
+                type:"post",
+                url:genAPI('wxDev/sellactivity/saveSellActivityContent'),
+                data:{
+                    "id":imgid,
+                    "title":title,
+                    "top":formtop,
+                    "content":content,
+                    "active":active,
+                    "desc":describe,
+                    "start_date":startTime,
+                    "end_date":endTime
+                },
+                dataType: "json",
+                success: function(res) {
+                    if(res.code == "00000") {
+                        window.location.href="http://localhost:63342/hyadmin/src/views/activity/marketing.html"
+
+                    }
+                }, error: function(XMLHttpRequest, textStatus, errorThrown) {
+
+                }
+            });
+            return false;
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -17,6 +17,8 @@
     <style>
     .layui-table img{max-width:100%;}
     .layui-layer-dialog .layui-layer-content{padding:0 20px 0 0!important;}
+    .layui-table, .layui-table-view{margin:0!important;}
+        .layui-btns{height:80px;line-height:80px;padding:0 4px;}
 </style>
 
 
@@ -29,14 +31,9 @@
         <button class="layui-btn layui-btn-danger">删除</button>
         <table lay-filter="toolbar" class="layui-hide" id="formTable"></table>
     </div>
+
 </div>
 
-
-<script type="text/html" id="barDemo">
-    <a class="layui-btn layui-btn-xs" lay-event="fabu">发布</a>
-    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
-</script>
 <script>
     layui.use(['table','form','layer'],function(){
         var table = layui.table,
@@ -83,17 +80,22 @@
 
             if(layEvent === 'fabu'){ //查看
                 layer.open({
+                    type:1,
+                    scrollbar:false,
                     title: '发布',
-                    area: ['800px', '500px'],
-                    offset: 'auto',
+                    btn: ['删除','确定'],
+                    area: 'auto',
                     maxWidth:'100%',
                     maxHeight :'100%',
-                    content: '<div id="tree" style="height: 400px;width:165px;font-size:12px;overflow-y :scroll;float: left"></div>' +
-                    '<div style="width:320px;font-size:12px;float: left;min-height:100%;">' +
-                    '<table class="layui-table" id="idTest" lay-filter="idTest"></table></div>' +
-                    '<div style="width:320px;font-size:12px;float: left"></div>',
-                    success: function(layero, index){
+                    content: $("#titleTpl").show(),
+                    yes: function(index, layero){
+                        $("#titleTpl").hide()
+                    },
+                    btn2: function(index, layero){
+                        $("#titleTpl").hide()
 
+                    },
+                    success: function(layero, index){
                         console.log(layero, index);
                         $.ajax({
                             type:"get",
@@ -113,7 +115,7 @@
                                     onNodeSelected: function(event, data) {
                                         console.info(data);
                                         console.info(data.treeId);
-                                        table.render({
+                                        /*table.render({
                                             elem: '#idTest',
                                             method:'get',
                                             url: genAPI('wxDev/sellactivity/getKhListByTreeId'),
@@ -134,14 +136,14 @@
                                             done: function(res, curr, count){
                                                 console.log(res);
                                             }
-                                        });
+                                        });*/
 
-                                        /*table.reload('idTest', {
+                                        table.reload('idTest', {
                                             method:'get',
                                             url: genAPI('wxDev/sellactivity/getKhListByTreeId'),
                                             where: {
-                                                   treeId: data.treeId
-                                                },
+                                                treeId: data.treeId
+                                            },
                                             response: {
                                                 statusName: 'code',//数据状态的字段名称，默认：code
                                                 statusCode: '00000', //成功的状态码，默认：0
@@ -149,8 +151,7 @@
                                                 //countName:'count',
                                                 dataName: 'data' //数据列表的字段名称，默认：data
                                             }
-                                        });*/
-                                        //table.init();
+                                        });
                                     }
                                 });
                             }
@@ -179,12 +180,65 @@
             console.log(obj.type); //如果触发的是全选，则为：all，如果触发的是单选，则为：one
         });
 
+        /*table.reload('idTest', {
+            method:'get',
+            url: genAPI('wxDev/sellactivity/getKhListByTreeId'),
+            where: {
+                    treeId: "330000"
 
+            },
+            cols: [[
+                {type: 'checkbox'},
+                {field:'khmc',align:'center', title:'客户名称'}
+            ]],
+            page:false,
+            response: {
+                statusName: 'code',//数据状态的字段名称，默认：code
+                statusCode: '00000', //成功的状态码，默认：0
+                msgName: 'msg', //状态信息的字段名称，默认：msg
+                countName:'count',
+                dataName: 'data' //数据列表的字段名称，默认：data
+            }
+        });*/
 
 
     });
 
 </script>
+<div style="display: none" id="titleTpl">
+    <div id="tree" style="height: 400px;width:165px;font-size:12px;overflow-y :scroll;float: left"></div>
+    <div style="width:400px;font-size:12px;float: left;min-height:100%;">
+        <table class="layui-table" lay-data="{id:'idTest',height:400}" >
+            <thead>
+            <tr>
+                <th lay-data="{checkbox:true}"></th>
+                <th lay-data="{field:'khmc',width:'80%'}">客户名称</th>
+            </tr>
+            </thead>
+        </table>
+
+    </div>
+    <div style="width:28px;float: left;">
+        <a style="" class="layui-btn layui-btns layui-btn-primary" href=""> >> </a>
+    </div>
+    <div style="width:400px;font-size:12px;float: left;min-height:100%;">
+        <table class="layui-table" lay-data="{id:'tableAdd',height:400}" >
+            <thead>
+            <tr>
+                <th lay-data="{checkbox:true}"></th>
+                <th lay-data="{field:'khmc',width:'80%'}">客户名称</th>
+            </tr>
+            </thead>
+        </table>
+
+    </div>
+</div>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="fabu">发布</a>
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
 
 </body>
+
 </html>

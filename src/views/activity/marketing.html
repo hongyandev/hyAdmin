@@ -18,7 +18,7 @@
     .layui-table img{max-width:100%;}
     .layui-layer-dialog .layui-layer-content{padding:0 20px 0 0!important;}
     .layui-table, .layui-table-view{margin:0!important;}
-        .layui-btns{height:80px;line-height:80px;padding:0 4px;}
+    .layui-btns{height:80px;line-height:80px;padding:0 4px;}
 </style>
 
 
@@ -40,6 +40,7 @@
             layer = layui.layer,
             form = layui.form;
 
+        var tempArray = [];
         table.render({
             elem: '#formTable',
             url:genAPI('/wxDev/sellactivity/getSellActivityListFenye'),
@@ -79,7 +80,7 @@
             var tr = obj.tr; //获得当前行 tr 的DOM对象
 
             if(layEvent === 'fabu'){ //查看
-                layer.open({
+                var index = layer.open({
                     type:1,
                     scrollbar:false,
                     title: '发布',
@@ -87,13 +88,12 @@
                     area: 'auto',
                     maxWidth:'100%',
                     maxHeight :'100%',
-                    content: $("#titleTpl").show(),
-                    yes: function(index, layero){
-                        $("#titleTpl").hide()
+                    content: $("#titleTpl"),
+                    btn1: function(index, layero){
+                        layer.close(index);
                     },
                     btn2: function(index, layero){
-                        $("#titleTpl").hide()
-
+                        layer.close(index);
                     },
                     success: function(layero, index){
                         console.log(layero, index);
@@ -137,6 +137,8 @@
                                                 console.log(res);
                                             }
                                         });*/
+                                        // 清空临时数组
+                                        tempArray.splice(0,tempArray.length);
 
                                         table.reload('idTest', {
                                             method:'get',
@@ -144,6 +146,7 @@
                                             where: {
                                                 treeId: data.treeId
                                             },
+                                            id : 'firstTable',
                                             response: {
                                                 statusName: 'code',//数据状态的字段名称，默认：code
                                                 statusCode: '00000', //成功的状态码，默认：0
@@ -174,7 +177,74 @@
                 });
             }
         });
-        table.on('checkbox(toolbar)', function(obj){
+
+        table.on('checkbox(idTest)', function(obj){
+            switch (obj.type) {
+                case 'all':
+                    if (obj.checked) {
+                        var firstdata = table.cache.firstTable;
+                        var seconddata = table.cache.secondTable;
+                        if (seconddata){
+                            $(firstdata).each(function () {
+                                var push = false;
+                                var data = $(this).get(0);
+                                $(seconddata).each(function () {
+                                    if (data.khdm == $(this).get(0).khdm){
+                                        push = true;
+                                        return false;
+                                    }
+                                });
+                                if (push) return;
+                                tempArray.push(data);
+                            });
+                        }else{
+                           tempArray =  tempArray.concat(firstdata);
+                        }
+                    } else {
+                        var firstdata = table.cache.firstTable;
+                        jQuery(firstdata).each(function () {
+                            var pos = -1;
+                            var data = $(this).get(0);
+                            jQuery(tempArray).each(function (i, e) {
+                                if (data.khdm == $(this).get(0).khdm){
+                                    pos = i;
+                                    return false;
+                                }
+                            });
+                            if (pos == -1) return;
+                            tempArray.splice(pos,1);
+                        });
+                    }
+                    break;
+                case 'one':
+                    if (obj.checked) {
+                        var contains = false;
+                        var seconddata = table.cache.secondTable;
+                        if (seconddata){
+                            $(seconddata).each(function () {
+                                if (obj.data.khdm == $(this).get(0).khdm){
+                                    contains = true;
+                                    return false;
+                                }
+                            });
+                            if (contains) return;
+                            tempArray.push(obj.data);
+                        }else{
+                            tempArray.push(obj.data);
+                        }
+                    } else {
+                        var pos = -1;
+                        $(tempArray).each(function (i, e) {
+                           if(obj.data.khdm == $(this).get(0).khdm){
+                               pos = i;
+                               return false;
+                           }
+                        });
+                        if (pos == -1) return;
+                        tempArray.splice(pos, 1);
+                    }
+                    break;
+            }
             console.log(obj.checked); //当前是否选中状态
             console.log(obj.data); //选中行的相关数据
             console.log(obj.type); //如果触发的是全选，则为：all，如果触发的是单选，则为：one
@@ -200,15 +270,41 @@
                 dataName: 'data' //数据列表的字段名称，默认：data
             }
         });*/
-
-
+/*        var addArray = [];
+        $(".layui-btns").click(function () {
+            //var table = $("#firstTable");
+            // var data = table.getData();
+            var a = table.cache.firstTable;
+            addArray = addArray.concat(a);
+            table.reload('tableAdd',{
+                data : addArray,
+                limit:addArray.length
+            });
+        })*/
+        $(".layui-btns").click(function () {
+            if (tempArray.length < 1) return;
+            var second = table.cache.secondTable;
+            if (second) {
+                second = second.concat(tempArray);
+            }else {
+                second = [].concat(tempArray);
+            }
+            table.reload('tableAdd',{
+                data : second,
+                limit:second.length,
+                id : 'secondTable',
+                done: function(){
+                    tempArray.splice(0,tempArray.length);
+                }
+            });
+        })
     });
 
 </script>
 <div style="display: none" id="titleTpl">
     <div id="tree" style="height: 400px;width:165px;font-size:12px;overflow-y :scroll;float: left"></div>
     <div style="width:400px;font-size:12px;float: left;min-height:100%;">
-        <table class="layui-table" lay-data="{id:'idTest',height:400}" >
+        <table class="layui-table" lay-data="{id:'idTest',height:400}" lay-filter="idTest" >
             <thead>
             <tr>
                 <th lay-data="{checkbox:true}"></th>
@@ -219,7 +315,7 @@
 
     </div>
     <div style="width:28px;float: left;">
-        <a style="" class="layui-btn layui-btns layui-btn-primary" href=""> >> </a>
+        <a style="" class="layui-btn layui-btns layui-btn-primary" href="javascript:void (0)"> >> </a>
     </div>
     <div style="width:400px;font-size:12px;float: left;min-height:100%;">
         <table class="layui-table" lay-data="{id:'tableAdd',height:400}" >

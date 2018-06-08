@@ -188,7 +188,7 @@
                     var title = data.field.title,
                         imgid = data.field.imgid;
                         content = UE.getEditor('editor').getContent(),
-                        active = data.field.state,
+                        active = data.field.state == "" ? "0" : "1",
                         order = parseInt(data.field.interest);
                     //自定义验证规则
                     form.verify({
@@ -209,12 +209,13 @@
                             "active":active,
                             "order":order
                         },
-                        //contentType: "application/json",
                         dataType: "json",
                         success: function(res) {
                             if(res.code == "00000") {
                                 window.location.href="http://localhost:63342/hyadmin/src/views/pic/swiper.html"
 
+                            }else{
+                                layer.msg(res.msg);
                             }
                         }, error: function(XMLHttpRequest, textStatus, errorThrown) {
 

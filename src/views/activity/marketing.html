@@ -27,9 +27,10 @@
 <body>
 <div class="layui-card">
     <div id="" class="layui-card-body" style="padding-top:10px;">
-        <a href="http://localhost:63342/hyadmin/src/views/activity/addActive.html" class="layui-btn">增加</a>
-        <button class="layui-btn layui-btn-danger">删除</button>
-        <table lay-filter="toolbar" class="layui-hide" id="formTable"></table>
+        <a style="margin-left:15px;" href="http://localhost:63342/hyadmin/src/views/activity/addActive.html" class="layui-btn">新增营销活动</a>
+        <div class="layui-card-body">
+            <table lay-filter="toolbar" class="layui-hide " id="formTable"></table>
+        </div>
     </div>
 
 </div>
@@ -45,19 +46,16 @@
             elem: '#formTable',
             url:genAPI('/wxDev/sellactivity/getSellActivityListFenye'),
             method:'get',
-            //where:'json',
-           // minWidth:80,
-            //cellMinWidth:60,
-           // height: 'full-10',
             page: true,
             cols: [[
-                {type:'numbers'},
-                {type: 'checkbox'},
-               /* {field:'id', title:'ID',align:'center',width:20},*/
-                {field:'picname',align:'center', title:'图片',width:120, templet: '<div><img src="{{ d.fileRealPath}}"></div>',style:""},
-                {field:'title',align:'center', title:'活动名称',},
-                {field:'top',align:'center', title:'是否置顶',},
-                {field:'opreate',align:'center', title:'操作',  toolbar: '#barDemo'},
+               // {type:'numbers'},
+                //{type: 'checkbox'},
+                {field:'picname',align:'center', title:'图片',width:120, templet: '<div><img src="{{d.fileRealPath}}?v={{Math.random()}}"></div>'},
+                {field:'title',align:'center', title:'活动名称'},
+                {field:'top',align:'center', title:'是否置顶',width:120,templet: function(d){
+                        return d.top == 0 ? "否" : "是";
+                    }},
+                {field:'opreate',align:'center', title:'操作',  toolbar: '#barDemo'}
             ]],
             request: {
                 pageName: 'page', //页码的参数名称，默认：page
@@ -81,24 +79,72 @@
             var id = data.id;
 
             if(layEvent === 'fabu'){ //查看
-                var index = layer.open({
+                var first = layer.open({
                     type:1,
                     scrollbar:false,
                     title: '发布',
-                    btn: ['删除','确定'],
+                    btn: ['删除','保存并发布'],
                     area: 'auto',
                     maxWidth:'100%',
                     maxHeight :'100%',
                     content: $("#titleTpl"),
                     btn1: function(index, layero){
-                        layer.close(index);
+                        var seconddata = table.cache.secondTable;
+                        var i = seconddata.length;
+                        while(i--){
+                            console.log(i+"="+seconddata[i]);
+                            if(seconddata[i].LAY_CHECKED){
+                                seconddata.splice(i,1);
+                            }
+                        }
+                        table.reload('tableAdd',{
+                            data : seconddata,
+                            limit:seconddata.length,
+                            id : 'secondTable'
+                        });
                     },
                     btn2: function(index, layero){
+                        var seconddata = table.cache.secondTable;
+                        if (!seconddata || seconddata.length < 1){
+                           layer.msg('您还没有选择发布对象');
+                            return false;
+                        }
                         var khdmArray = [];
-                        $(table.cache.secondTable).each(function () {
+                        $(seconddata).each(function () {
                             khdmArray.push($(this).get(0).khdm);
                         });
-                        layer.close(index);
+                        var khdm = JSON.stringify(khdmArray);
+                        $.ajax({
+                            type:"post",
+                            url:genAPI('wxDev/sellactivity/saveSellingActivityScope'),
+                            data:{
+                                khdm:khdm,
+                                id:id
+                            },
+                            dataType:'json',
+                            success:function (res) {
+                                if(res.code == '00000'){
+                                    table.reload('idTest',{
+                                        data : [],
+                                        count : 0
+                                    });
+                                    table.reload('tableAdd',{
+                                        data : [],
+                                        count : 0
+                                    });
+                                    layer.msg("已发布成功", {
+                                        time: 2000
+                                    }, function(){
+                                        layer.close(first);
+                                    });
+
+                                }else{
+                                    layer.msg(msg);
+                                }
+
+                            }
+                        });
+
                     },
                     success: function(layero, index){
                         console.log(layero, index);
@@ -118,30 +164,9 @@
                                     onhoverColor:'#6bbfb7',
                                     selectedBackColor:'#009688',
                                     onNodeSelected: function(event, data) {
-                                        console.info(data);
-                                        console.info(data.treeId);
-                                        /*table.render({
-                                            elem: '#idTest',
-                                            method:'get',
-                                            url: genAPI('wxDev/sellactivity/getKhListByTreeId'),
-                                            where: {
-                                                 treeId: data.treeId
-                                            },
-                                            cols: [[
-                                                {type: 'checkbox'},
-                                                {field:'khmc',align:'center', title:'客户名称'}
-                                            ]],
-                                            response: {
-                                                statusName: 'code',//数据状态的字段名称，默认：code
-                                                statusCode: '00000', //成功的状态码，默认：0
-                                                msgName: 'msg', //状态信息的字段名称，默认：msg
-                                                countName:'count',
-                                                dataName: 'data' //数据列表的字段名称，默认：data
-                                            },
-                                            done: function(res, curr, count){
-                                                console.log(res);
-                                            }
-                                        });*/
+                                       // console.info(data);
+                                       // console.info(data.treeId);
+
                                         // 清空临时数组
                                         tempArray.splice(0,tempArray.length);
 
@@ -152,11 +177,11 @@
                                                 treeId: data.treeId
                                             },
                                             id : 'firstTable',
+                                           // count:0,
                                             response: {
                                                 statusName: 'code',//数据状态的字段名称，默认：code
                                                 statusCode: '00000', //成功的状态码，默认：0
                                                 msgName: 'msg', //状态信息的字段名称，默认：msg
-                                                //countName:'count',
                                                 dataName: 'data' //数据列表的字段名称，默认：data
                                             }
                                         });
@@ -166,23 +191,109 @@
                         });
                     }
                  });
+
+                var h = $(".layui-layer").height();
+                $(".layui-btns").css("margin-top",h/2-80+"px");
+
+                //console.info(h/2+"px");
             } else if(layEvent === 'del'){ //删除
                 layer.confirm('你确定要删除吗？', function(index){
                     obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
-                    layer.close(index);
                     //向服务端发送删除指令
+                    $.ajax({
+                        url:genAPI('wxDev/sellactivity/deleteSellActivityById'),
+                        type:"post",
+                        data:{
+                            "id":id,
+                        },
+                        dataType:"json",
+                        success:function (res) {
+                            if(res.code == '00000'){
+                                layer.msg("已经删除成功", {
+                                    time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                                }, function(){
+                                    layer.close(second);
+                                });
+                            }else{
+                                layer.msg(msg);
+                            }
+
+                        }
+                    })
+
+
+
                 });
             } else if(layEvent === 'edit'){ //编辑
                 //do something
                 console.info(obj);
-                //同步更新缓存对应的值
-                obj.update({
-                    username: '123'
-                    ,title: 'xxx'
+            } else if(layEvent === 'fabudx'){
+                var second = layer.open({
+                    type:1,
+                    scrollbar:false,
+                    title: '删除发布对象',
+                    btn: ['删除'],
+                    area: 'auto',
+                    maxWidth:'100%',
+                    maxHeight :'100%',
+                    content: $("#fbContent"),
+                    btn1: function(index, layero){
+                        var fbdxData = table.cache.tableCon;
+                        var fbdxArray = [];
+                        $(fbdxData).each(function (i) {
+                            if(fbdxData[i].LAY_CHECKED){
+                                fbdxArray.push($(this).get(0).khdm);
+                            }
+                            var fbdxArr = JSON.stringify(fbdxArray);
+                            layer.confirm('你确定要删除吗？', function(index){
+
+                                $.ajax({
+                                    url:genAPI('wxDev/sellactivity/deleteSellingActivityScope'),
+                                    type:"post",
+                                    data:{
+                                        "id":id,
+                                        "scope":fbdxArr
+                                    },
+                                    dataType:"json",
+                                    success:function (res) {
+                                        if(res.code == '00000'){
+                                            layer.msg("已经删除成功", {
+                                                time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                                            }, function(){
+                                                layer.close(second);
+                                            });
+                                        }else{
+                                            layer.msg(msg);
+                                        }
+
+                                    }
+                                })
+                            });
+
+                        });
+
+                    },
+                    success: function(layero, index){
+                        console.log(layero, index);
+                        table.reload('tableContent', {
+                            method:'get',
+                            url: genAPI('wxDev/sellactivity/getSellingActivityScopeById'),
+                            where: {
+                                id: id
+                            },
+                            id : 'tableCon',
+                            response: {
+                                statusName: 'code',//数据状态的字段名称，默认：code
+                                statusCode: '00000', //成功的状态码，默认：0
+                                msgName: 'msg', //状态信息的字段名称，默认：msg
+                                dataName: 'data' //数据列表的字段名称，默认：data
+                            }
+                        });
+                    }
                 });
             }
         });
-
+        //监控经销商
         table.on('checkbox(idTest)', function(obj){
             switch (obj.type) {
                 case 'all':
@@ -250,42 +361,9 @@
                     }
                     break;
             }
-            console.log(obj.checked); //当前是否选中状态
-            console.log(obj.data); //选中行的相关数据
-            console.log(obj.type); //如果触发的是全选，则为：all，如果触发的是单选，则为：one
+
         });
 
-        /*table.reload('idTest', {
-            method:'get',
-            url: genAPI('wxDev/sellactivity/getKhListByTreeId'),
-            where: {
-                    treeId: "330000"
-
-            },
-            cols: [[
-                {type: 'checkbox'},
-                {field:'khmc',align:'center', title:'客户名称'}
-            ]],
-            page:false,
-            response: {
-                statusName: 'code',//数据状态的字段名称，默认：code
-                statusCode: '00000', //成功的状态码，默认：0
-                msgName: 'msg', //状态信息的字段名称，默认：msg
-                countName:'count',
-                dataName: 'data' //数据列表的字段名称，默认：data
-            }
-        });*/
-/*        var addArray = [];
-        $(".layui-btns").click(function () {
-            //var table = $("#firstTable");
-            // var data = table.getData();
-            var a = table.cache.firstTable;
-            addArray = addArray.concat(a);
-            table.reload('tableAdd',{
-                data : addArray,
-                limit:addArray.length
-            });
-        })*/
         $(".layui-btns").click(function () {
             if (tempArray.length < 1) return;
             var second = table.cache.secondTable;
@@ -309,7 +387,7 @@
 <div style="display: none" id="titleTpl">
     <div id="tree" style="height: 400px;width:165px;font-size:12px;overflow-y :scroll;float: left"></div>
     <div style="width:400px;font-size:12px;float: left;min-height:100%;">
-        <table class="layui-table" lay-data="{id:'idTest',height:400}" lay-filter="idTest" >
+        <table class="layui-table" lay-data="{id:'idTest',height:400,loading:'true'}" lay-filter="idTest" >
             <thead>
             <tr>
                 <th lay-data="{checkbox:true}"></th>
@@ -319,11 +397,11 @@
         </table>
 
     </div>
-    <div style="width:28px;float: left;">
-        <a style="" class="layui-btn layui-btns layui-btn-primary" href="javascript:void (0)"> >> </a>
+    <div style="width:28px;float: left;margin:auto 10px;">
+        <button class="layui-btn layui-btns"> >> </button>
     </div>
     <div style="width:400px;font-size:12px;float: left;min-height:100%;">
-        <table class="layui-table" lay-data="{id:'tableAdd',height:400}" >
+        <table class="layui-table" lay-data="{id:'tableAdd',height:400,loading:'true'}" lay-filter="tableAdd">
             <thead>
             <tr>
                 <th lay-data="{checkbox:true}"></th>
@@ -334,10 +412,22 @@
 
     </div>
 </div>
+<div id="fbContent" style="display: none">
+    <table style="margin:20px;" class="layui-table" lay-data="{id:'tableContent',height:400,loading:'true'}" lay-filter="tableContent">
+        <thead>
+        <tr>
+            <th lay-data="{checkbox:true}"></th>
+            <th lay-data="{field:'khmc',width:'50%'}">发布客户</th>
+            <th lay-data="{field:'createDate',width:'30%'}">发布时间</th>
+        </tr>
+        </thead>
+    </table>
+</div>
 <script type="text/html" id="barDemo">
     <a class="layui-btn layui-btn-xs" lay-event="fabu">发布</a>
-    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a href="http://localhost:63342/hyadmin/src/views/activity/addActive.html?id={{d.id}}" class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
     <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    <a class="layui-btn layui-btn-xs" lay-event="fabudx">已发布对象</a>
 </script>
 
 </body>

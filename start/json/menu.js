@@ -36,7 +36,7 @@
     ,"list": [{
         "name": "codeManger"
         ,"title": "兑换码管理"
-        ,"jump": "code/codeManger"
+        ,"jump": "code/reg"
     }]
 }
 ,{

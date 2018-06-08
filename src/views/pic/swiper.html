@@ -56,8 +56,8 @@
                         str+="<div class=\"layui-col-xs4\">\n" +
                             "       <a href="+'http://localhost:63342/hyadmin/src/views/pic/picAdd.html?id='+o.id+" class=\"layui-card\">\n" +
                             "            <div class=\"layui-card-header layui-elip layTitle\">"+o.title+"</div>\n" +
-                            "                 <div class=\"layui-card-body\">\n" +
-                            "                       <img src="+o.fileRealPath+" />\n" +
+                            "                 <div class=\"layui-card-body\">" +
+                            "                       <img src="+o.fileRealPath+"?v="+Math.random()+" />" +
                             "                   </div>\n" +
                             "         </a>\n" +
                             "</div>"

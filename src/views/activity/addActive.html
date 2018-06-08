@@ -41,14 +41,14 @@
            <div class="layui-form-item">
                <label class="layui-form-label">描述</label>
                <div class="layui-input-block">
-                   <input type="text" name="describe" lay-verify="describe" autocomplete="off" placeholder="请填写描述" class="layui-input">
+                   <input type="text" id="describe" name="describe" lay-verify="describe" autocomplete="off" placeholder="请填写描述" class="layui-input">
                </div>
            </div>
            <div class="layui-form-item">
                <label class="layui-form-label">置顶</label>
                <div class="layui-input-block">
-                   <input type="radio" name="formtop" value="1" title="是">
-                   <input type="radio" name="formtop" value="0" title="否" checked>
+                   <input class="top1" lay-filter="top" type="radio" name="formtop" value="0" title="否" checked>
+                   <input class="top2" lay-filter="top" type="radio" name="formtop" value="1"  title="是">
                </div>
            </div>
            <div class="layui-form-item">
@@ -66,7 +66,7 @@
                </div>
            </div>
            <div class="layui-form-item">
-               <div class="layuiImg"><input type="hidden" lay-verify="file" name="imgid" id="imgId" value=""/><img class="imgview" /></div>
+               <div class="layui-input-block layuiImg"><input type="hidden" lay-verify="file" name="imgid" id="imgId" value=""/><img class="imgview" /></div>
                <label class="layui-form-label">上传图片</label>
                <div class="layui-input-block">
                    <button type="button" class="layui-btn" id="uploadImg">
@@ -84,13 +84,14 @@
            <div class="layui-form-item">
                  <label class="layui-form-label">是否启用</label>
                  <div class="layui-input-block">
-                 <input id="state" value="1" type="checkbox" name="state" lay-skin="switch" lay-text="启用|禁用" checked/>
+                    <input type="checkbox" value="1" name="switch" lay-skin="switch" >
+                    <!--<input id="state" type="checkbox" name="state" lay-skin="switch" lay-text="启用|禁用"/>-->
                  </div>
             </div>
            <div class="layui-form-item">
                <div class="layui-input-block">
                    <button class="layui-btn" lay-submit lay-filter="formsubmit">立即提交</button>
-                   <a class="layui-btn layui-btn-primary" href="http://localhost:63342/hyadmin/src/views/activity/marketing.html">返回</a>
+                   <a class="layui-btn layui-btn-primary" href="marketing.html">返回</a>
                </div>
            </div>
        </form>
@@ -145,6 +146,55 @@
             upload = layui.upload,
             layer = layui.layer,
             form = layui.form;
+        $(function () {
+            function getQueryString(name){
+                var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+                var r = window.location.search.substr(1).match(reg);
+                if(r!=null) return unescape(r[2]);return null;
+            }
+            var id = (getQueryString('id')!=null ? getQueryString('id') : null);
+            $.ajax({
+                type:"get",
+                url:genAPI('wxDev/sellactivity/getSellActivityById?id='+id),
+                dataType: "json",
+                success: function(res) {
+                    if(res.code == "00000") {
+                        $("#title").val(res.data.title);
+                        $("#describe").val(res.data.desc);
+                        UE.getEditor('editor').execCommand('insertHtml', res.data.content);
+                        $(".imgview").attr("src",res.data.fileRealPath+'?v='+Math.random());
+                        $("#imgId").val(res.data.id);
+                        laydate.render({
+                            elem: '#laydate-start',
+                            value: res.data.startDate, //必须遵循format参数设定的格式
+                        });
+                        laydate.render({
+                            elem: '#laydate-end',
+                            value: res.data.endDate,//必须遵循format参数设定的格式
+
+                        });
+                        console.info(res.data.startDate);
+                        //$(".top").val(res.data.top);
+                        form.on('radio(top)', function(data){
+                            console.log(data.elem); //得到radio原始DOM对象
+                            console.log(data.value); //被点击的radio的value值
+
+                        });
+                        $("[name=formtop][value='"+res.data.top+"']").attr("checked",true);
+                        form.render('radio');
+
+                        $("#state").val(res.data.active);
+                        form.render('checkbox');
+
+                    }
+                }, error: function(XMLHttpRequest, textStatus, errorThrown) {
+
+                }
+            });
+        });
+
+
+
         //上传图片
         upload.render({
             elem: '#uploadImg',
@@ -223,17 +273,17 @@
             }
         });
         form.on('submit(formsubmit)', function(data){
-            //console.info(data.field);
+            console.info(data.field);
             var title = data.field.title,
                 imgid = data.field.imgid;
                 content = UE.getEditor('editor').getContent(),
-                active = data.field.state,
+                active =  data.field.switch == "" ? "0" : "1",
                 formtop = data.field.formtop,
                 describe = data.field.describe,
                 startTime = data.field.startTime,
                 endTime = data.field.endTime;
             //自定义验证规则
-
+            //return;
             $.ajax({
                 type:"post",
                 url:genAPI('wxDev/sellactivity/saveSellActivityContent'),
@@ -244,14 +294,15 @@
                     "content":content,
                     "active":active,
                     "desc":describe,
-                    "start_date":startTime,
-                    "end_date":endTime
+                    "startDate":startTime,
+                    "endDate":endTime
                 },
                 dataType: "json",
                 success: function(res) {
                     if(res.code == "00000") {
                         window.location.href="http://localhost:63342/hyadmin/src/views/activity/marketing.html"
-
+                    }else{
+                        layer.msg(res.msg);
                     }
                 }, error: function(XMLHttpRequest, textStatus, errorThrown) {
 

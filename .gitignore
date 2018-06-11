@@ -67,3 +67,4 @@ typings/
 # config
 /src/config.js
 /src/views/layout.html
+/src/views/config_admin.js

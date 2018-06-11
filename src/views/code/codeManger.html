@@ -10,7 +10,6 @@
 							<div class="layui-btn-group">
 								<button class="layui-btn layui-btn-sm">搜索</button>
 								<button class="layui-btn layui-btn-sm" onclick="newCode()" id="newCode">兑换码创建</button>
-								<button class="layui-btn layui-btn-sm" onclick="applyCode()" id="appCode">兑换码申请</button>
 							</div>
 						</div>
 					</div>
@@ -197,25 +196,25 @@
             '\t\t\t<div class="layui-form-item">' +
             '\t\t\t\t<label class="layui-form-label">兑换码总量</label>' +
             '\t\t\t\t<div class="layui-input-block">' +
-            '\t\t\t\t\t<input type="text" name="title" required lay-verify="required" autocomplete="off" class="layui-input">' +
+            '\t\t\t\t\t<input type="text" name="title" required lay-verify="required" class="layui-input">' +
             '\t\t\t\t</div>' +
             '\t\t\t</div>' +
             '\t\t\t<div class="layui-form-item">' +
             '\t\t\t\t<label class="layui-form-label">已分配总量</label>' +
             '\t\t\t\t<div class="layui-input-block">' +
-            '\t\t\t\t\t<input type="text" name="title" required lay-verify="required" autocomplete="off" class="layui-input">' +
+            '\t\t\t\t\t<input type="text" name="title" required lay-verify="required" class="layui-input">' +
             '\t\t\t\t</div>' +
             '\t\t\t</div>' +
             '\t\t\t<div class="layui-form-item">' +
             '\t\t\t\t<label class="layui-form-label">未分配总量</label>' +
             '\t\t\t\t<div class="layui-input-block">' +
-            '\t\t\t\t\t<input type="text" name="title" required lay-verify="required" autocomplete="off" class="layui-input">' +
+            '\t\t\t\t\t<input type="text" name="title" required lay-verify="required" class="layui-input">' +
             '\t\t\t\t</div>' +
             '\t\t\t</div>' +
             '\t\t\t<div class="layui-form-item">' +
             '\t\t\t\t<label class="layui-form-label">创建数量</label>' +
             '\t\t\t\t<div class="layui-input-block">' +
-            '\t\t\t\t\t<input type="text" name="title" required lay-verify="required" autocomplete="off" class="layui-input">' +
+            '\t\t\t\t\t<input type="text" name="title" required lay-verify="required" class="layui-input">' +
             '\t\t\t\t</div>' +
             '\t\t\t</div>' +
             '\t\t\t<div class="layui-form-item">' +
@@ -228,54 +227,6 @@
         });
     };
 
-    //兑换码申请
-    function applyCode() {
-        layer.open({
-            type: 1,
-            title: '兑换码申请',
-            // closeBtn: 0,
-            // shadeClose: true,
-            area: ['800px', '380px'],
-            skin: 'layui-layer-rim',
-            content: '<form class="layui-form" style="margin: 15px">\n' +
-            '\t\t\t<div class="layui-form-item">\n' +
-            '\t\t\t\t<label class="layui-form-label">客户名称</label>\n' +
-            '\t\t\t\t<div class="layui-input-block">\n' +
-            '\t\t\t\t\t<input type="text" name="title" required lay-verify="required" autocomplete="off" class="layui-input">\n' +
-            '\t\t\t\t</div>\n' +
-            '\t\t\t</div>\n' +
-            '\t\t\t<div class="layui-form-item">\n' +
-            '\t\t\t\t<label class="layui-form-label">积分面额</label>\n' +
-            '\t\t\t\t<div class="layui-input-block">\n' +
-            '\t\t\t\t\t<input type="text" name="title" required lay-verify="required" autocomplete="off" class="layui-input">\n' +
-            '\t\t\t\t</div>\n' +
-            '\t\t\t</div>\n' +
-            '\t\t\t<div class="layui-form-item">\n' +
-            '\t\t\t\t<label class="layui-form-label">申请数量</label>\n' +
-            '\t\t\t\t<div class="layui-input-block">\n' +
-            '\t\t\t\t\t<input type="text" name="title" required lay-verify="required" autocomplete="off" class="layui-input">\n' +
-            '\t\t\t\t</div>\n' +
-            '\t\t\t</div>\n' +
-            '\t\t\t<div class="layui-form-item">\n' +
-            '\t\t\t\t<label class="layui-form-label">起始码</label>\n' +
-            '\t\t\t\t<div class="layui-input-block">\n' +
-            '\t\t\t\t\t<input type="text" name="title" required lay-verify="required" autocomplete="off" class="layui-input">\n' +
-            '\t\t\t\t</div>\n' +
-            '\t\t\t</div>\n' +
-            '\t\t\t<div class="layui-form-item">\n' +
-            '\t\t\t\t<label class="layui-form-label">结束码</label>\n' +
-            '\t\t\t\t<div class="layui-input-block">\n' +
-            '\t\t\t\t\t<input type="text" name="title" required lay-verify="required" autocomplete="off" class="layui-input">\n' +
-            '\t\t\t\t</div>\n' +
-            '\t\t\t</div>\n' +
-            '\t\t\t<div class="layui-form-item">\n' +
-            '\t\t\t\t<div class="layui-input-block">\n' +
-            '\t\t\t\t\t<button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-warm" style="float: right">分配</button>\n' +
-            '\t\t\t\t</div>\n' +
-            '\t\t\t</div>\n' +
-            '\t\t</form>'
-        });
-    };
 
     //日期区间special-demo.html
     layui.config({

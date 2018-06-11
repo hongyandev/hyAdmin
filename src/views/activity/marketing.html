@@ -42,14 +42,16 @@
             form = layui.form;
 
         var tempArray = [];
+
         table.render({
             elem: '#formTable',
             url:genAPI('/wxDev/sellactivity/getSellActivityListFenye'),
             method:'get',
             page: true,
             cols: [[
-               // {type:'numbers'},
+                //{type:'numbers'},
                 //{type: 'checkbox'},
+                {field:'id',align:'center',title:'ID',width:80,},
                 {field:'picname',align:'center', title:'图片',width:120, templet: '<div><img src="{{d.fileRealPath}}?v={{Math.random()}}"></div>'},
                 {field:'title',align:'center', title:'活动名称'},
                 {field:'top',align:'center', title:'是否置顶',width:120,templet: function(d){
@@ -72,13 +74,102 @@
                 console.log(res);
             }
         });
+        //监控经销商
+        table.on('checkbox(idTest)', function(obj){
+            switch (obj.type) {
+                case 'all':
+                    if (obj.checked) {
+                        var firstdata = table.cache.firstTable;
+                        var seconddata = table.cache.secondTable;
+                        if (seconddata){
+                            $(firstdata).each(function () {
+                                var push = false;
+                                var data = $(this).get(0);
+                                $(seconddata).each(function () {
+                                    if (data.khdm == $(this).get(0).khdm){
+                                        push = true;
+                                        return false;
+                                    }
+                                });
+                                if (push) return;
+                                tempArray.push(data);
+                            });
+                        }else{
+                            tempArray =  tempArray.concat(firstdata);
+                        }
+                    } else {
+                        var firstdata = table.cache.firstTable;
+                        jQuery(firstdata).each(function () {
+                            var pos = -1;
+                            var data = $(this).get(0);
+                            jQuery(tempArray).each(function (i, e) {
+                                if (data.khdm == $(this).get(0).khdm){
+                                    pos = i;
+                                    return false;
+                                }
+                            });
+                            if (pos == -1) return;
+                            tempArray.splice(pos,1);
+                        });
+                    }
+                    break;
+                case 'one':
+                    if (obj.checked) {
+                        var contains = false;
+                        var seconddata = table.cache.secondTable;
+                        if (seconddata){
+                            $(seconddata).each(function () {
+                                if (obj.data.khdm == $(this).get(0).khdm){
+                                    contains = true;
+                                    return false;
+                                }
+                            });
+                            if (contains) return;
+                            tempArray.push(obj.data);
+                        }else{
+                            tempArray.push(obj.data);
+                        }
+
+                    } else {
+                        var pos = -1;
+                        $(tempArray).each(function (i, e) {
+                            if(obj.data.khdm == $(this).get(0).khdm){
+                                pos = i;
+                                return false;
+                            }
+                        });
+                        if (pos == -1) return;
+                        tempArray.splice(pos, 1);
+                    }
+                    break;
+            }
+
+        });
+        $(".layui-btns").click(function () {
+            if (tempArray.length < 1) return;
+            var  second = table.cache.secondTable;
+            if (second) {
+                second = second.concat(tempArray);
+            }else {
+                second = [].concat(tempArray);
+            }
+            table.reload('tableAdd',{
+                data : second,
+                limit:second.length,
+                id : 'secondTable',
+                done: function(){
+                    tempArray.splice(0,tempArray.length);
+                    second.splice(0,second.length);
+                }
+            });
+        })
         table.on('tool(toolbar)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
             var data = obj.data; //获得当前行数据
             var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
             var tr = obj.tr; //获得当前行 tr 的DOM对象
             var id = data.id;
 
-            if(layEvent === 'fabu'){ //查看
+            if(layEvent === 'fabu'){ //发布
                 var first = layer.open({
                     type:1,
                     scrollbar:false,
@@ -114,6 +205,7 @@
                             khdmArray.push($(this).get(0).khdm);
                         });
                         var khdm = JSON.stringify(khdmArray);
+                        var loading = layer.load(1);
                         $.ajax({
                             type:"post",
                             url:genAPI('wxDev/sellactivity/saveSellingActivityScope'),
@@ -126,20 +218,22 @@
                                 if(res.code == '00000'){
                                     table.reload('idTest',{
                                         data : [],
-                                        count : 0
+                                        count : 0,
+                                        id : 'firstTable',
                                     });
                                     table.reload('tableAdd',{
                                         data : [],
-                                        count : 0
+                                        count : 0,
+                                        id : 'secondTable'
                                     });
                                     layer.msg("已发布成功", {
-                                        time: 2000
-                                    }, function(){
+                                        time: 4000
+                                    },function () {
                                         layer.close(first);
                                     });
-
+                                    layer.close(loading);
                                 }else{
-                                    layer.msg(msg);
+                                    layer.msg(res.msg);
                                 }
 
                             }
@@ -148,6 +242,7 @@
                     },
                     success: function(layero, index){
                         console.log(layero, index);
+                        var loading = layer.load(1);
                         $.ajax({
                             type:"get",
                             url : genAPI('wxDev/sellactivity/getDistrict'), // 请求的URL
@@ -156,6 +251,7 @@
                             cache : false,
                             success : function(res) {
                                 console.info(res);
+                                layer.close(loading);
                                 $('#tree').treeview({
                                     data: res.data,
                                     showBorder:false,
@@ -293,94 +389,7 @@
                 });
             }
         });
-        //监控经销商
-        table.on('checkbox(idTest)', function(obj){
-            switch (obj.type) {
-                case 'all':
-                    if (obj.checked) {
-                        var firstdata = table.cache.firstTable;
-                        var seconddata = table.cache.secondTable;
-                        if (seconddata){
-                            $(firstdata).each(function () {
-                                var push = false;
-                                var data = $(this).get(0);
-                                $(seconddata).each(function () {
-                                    if (data.khdm == $(this).get(0).khdm){
-                                        push = true;
-                                        return false;
-                                    }
-                                });
-                                if (push) return;
-                                tempArray.push(data);
-                            });
-                        }else{
-                           tempArray =  tempArray.concat(firstdata);
-                        }
-                    } else {
-                        var firstdata = table.cache.firstTable;
-                        jQuery(firstdata).each(function () {
-                            var pos = -1;
-                            var data = $(this).get(0);
-                            jQuery(tempArray).each(function (i, e) {
-                                if (data.khdm == $(this).get(0).khdm){
-                                    pos = i;
-                                    return false;
-                                }
-                            });
-                            if (pos == -1) return;
-                            tempArray.splice(pos,1);
-                        });
-                    }
-                    break;
-                case 'one':
-                    if (obj.checked) {
-                        var contains = false;
-                        var seconddata = table.cache.secondTable;
-                        if (seconddata){
-                            $(seconddata).each(function () {
-                                if (obj.data.khdm == $(this).get(0).khdm){
-                                    contains = true;
-                                    return false;
-                                }
-                            });
-                            if (contains) return;
-                            tempArray.push(obj.data);
-                        }else{
-                            tempArray.push(obj.data);
-                        }
-                    } else {
-                        var pos = -1;
-                        $(tempArray).each(function (i, e) {
-                           if(obj.data.khdm == $(this).get(0).khdm){
-                               pos = i;
-                               return false;
-                           }
-                        });
-                        if (pos == -1) return;
-                        tempArray.splice(pos, 1);
-                    }
-                    break;
-            }
 
-        });
-
-        $(".layui-btns").click(function () {
-            if (tempArray.length < 1) return;
-            var second = table.cache.secondTable;
-            if (second) {
-                second = second.concat(tempArray);
-            }else {
-                second = [].concat(tempArray);
-            }
-            table.reload('tableAdd',{
-                data : second,
-                limit:second.length,
-                id : 'secondTable',
-                done: function(){
-                    tempArray.splice(0,tempArray.length);
-                }
-            });
-        })
     });
 
 </script>

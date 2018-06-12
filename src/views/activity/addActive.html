@@ -84,7 +84,7 @@
            <div class="layui-form-item">
                  <label class="layui-form-label">是否启用</label>
                  <div class="layui-input-block">
-                    <input type="checkbox" value="1" name="switch" lay-skin="switch" lay-text="启用|禁用" />
+                    <input type="checkbox" value="1" id="state" name="switch" lay-skin="switch" lay-text="启用|禁用" />
                     <!--<input id="state" type="checkbox" name="state" lay-skin="switch" lay-text="启用|禁用"/>-->
                  </div>
             </div>
@@ -184,6 +184,11 @@
                         form.render('radio');
 
                         $("#state").val(res.data.active);
+                        if($("#state").val() == "1"){
+                            $("#state").attr("checked",true);
+                        }else{
+                            $("#state").attr("checked",false);
+                        }
                         form.render('checkbox');
 
                     }
@@ -300,7 +305,8 @@
                 dataType: "json",
                 success: function(res) {
                     if(res.code == "00000") {
-                        window.location.href="http://wx.hongyancloud.com/hyadmin/src/views/activity/marketing.html"
+                        window.location.href = aLink('src/views/activity/marketing.html')
+                       // window.location.href="http://wx.hongyancloud.com/hyadmin/src/views/activity/marketing.html"
                     }else{
                         layer.msg(res.msg);
                     }

@@ -201,7 +201,6 @@
                     $.ajax({
                         type:"post",
                         url:genAPI('wxDev/homepage/saveHomeContent'),
-                        //url:"http://wxdev.hongyancloud.com/wxDev/homepage/saveHomeContent",
                         data:{
                             "id":imgid,
                             "title":title,
@@ -212,8 +211,8 @@
                         dataType: "json",
                         success: function(res) {
                             if(res.code == "00000") {
-                                window.location.href="http://localhost:63342/hyadmin/src/views/pic/swiper.html"
-
+                                //window.location.href="http://localhost:63342/hyadmin/src/views/pic/swiper.html"
+                                window.location.href = aLink('src/views/pic/swiper.html')
                             }else{
                                 layer.msg(res.msg);
                             }
@@ -222,11 +221,6 @@
                         }
                     });
                     return false;
-                });
-
-                $("#goBack").click(function () {
-                   // window.location.href="http://localhost:63342/hyadmin/src/views/pic/swiper.html"
-                    window.location.reload();
                 });
             });
         </script>

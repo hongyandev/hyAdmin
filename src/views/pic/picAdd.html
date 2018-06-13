@@ -139,7 +139,7 @@
                                 $("#order").val(res.data.order);
                                 form.render('select');
                                 $("#state").val(res.data.active);
-                                if($("#state").val() == "on"){
+                                if($("#state").val() == "1"){
                                     $("#state").attr("checked",true);
                                 }else{
                                     $("#state").attr("checked",false);

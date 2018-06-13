@@ -27,7 +27,7 @@
 <body>
 <div class="layui-card">
     <div id="" class="layui-card-body" style="padding-top:10px;">
-        <a style="margin-left:15px;" href="http://localhost:63342/hyadmin/src/views/activity/addActive.html" class="layui-btn">新增营销活动</a>
+        <a id="addActivity" style="margin-left:15px;" class="layui-btn">新增营销活动</a>
         <div class="layui-card-body">
             <table lay-filter="toolbar" class="layui-hide " id="formTable"></table>
         </div>
@@ -36,13 +36,15 @@
 </div>
 
 <script>
-    layui.use(['table','form','layer'],function(){
+    layui.use(['jquery','table','form','layer'],function(){
         var table = layui.table,
             layer = layui.layer,
             form = layui.form;
 
         var tempArray = [];
-
+        $(function () {
+            $("#addActivity").attr("href", aLink('src/views/activity/addActive.html'));
+        });
         table.render({
             elem: '#formTable',
             url:genAPI('/wxDev/sellactivity/getSellActivityListFenye'),

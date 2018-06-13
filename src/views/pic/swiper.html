@@ -52,16 +52,13 @@
         var flow = layui.flow;
         $(function () {
             $("#uploadImg").attr("href", aLink('src/views/pic/picAdd.html'));
-           // console.info(aLink('src/views/pic/picAdd.html'));
         });
         $.ajax({
             type:"get",
             url:genAPI('wxDev/homepage/getHomeImageList'),
-
             dataType: "json",
             success: function(res) {
                 if(res.code == "00000") {
-
                    var str="";
                     $.each(res.data,function (i,o) {
                         str+="<div class=\"layui-col-xs4\">\n" +

@@ -58,7 +58,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label">是否启用</label>
             <div class="layui-input-block">
-                <input id="state" type="checkbox" name="state" lay-skin="switch" lay-text="启用|禁用">
+                <input type="checkbox"  name="active" lay-skin="switch" lay-text="启用|禁用" >
             </div>
         </div>
         <div class="layui-form-item">
@@ -138,11 +138,11 @@
                                 $("#imgId").val(res.data.id);
                                 $("#order").val(res.data.order);
                                 form.render('select');
-                                $("#state").val(res.data.active);
-                                if($("#state").val() == "1"){
-                                    $("#state").attr("checked",true);
+                                var active = $("input[name=active]").val(res.data.active).get(0).value;
+                                if(active=='1'){
+                                    $("input[name=active]").attr("checked",true);
                                 }else{
-                                    $("#state").attr("checked",false);
+                                    $("input[name=active]").attr("checked",false);
                                 }
                                 form.render('checkbox');
 
@@ -188,8 +188,13 @@
                     var title = data.field.title,
                         imgid = data.field.imgid;
                         content = UE.getEditor('editor').getContent(),
-                        active = data.field.state == "on" ? "1" : "0",
+                         //active =  data.field.state == 0 ? "1" : "0",
                         order = parseInt(data.field.interest);
+                        if(data.field.active){
+                            active = "1";
+                        }else{
+                            active = "0";
+                        }
                     //自定义验证规则
                     form.verify({
                         title: function(value){

@@ -85,7 +85,7 @@
                  <label class="layui-form-label">是否启用</label>
                  <div class="layui-input-block">
                    <!-- <input type="checkbox"  id="state" name="switch" lay-skin="switch" lay-text="启用|禁用" />-->
-                    <input type="checkbox" name="active" lay-skin="switch" lay-text="启用|禁用" >
+                    <input type="checkbox" id="active" name="active" lay-skin="switch" lay-text="启用|禁用" >
                  </div>
             </div>
            <div class="layui-form-item">
@@ -173,7 +173,7 @@
                             value: res.data.endDate,//必须遵循format参数设定的格式
 
                         });
-                        console.info(res.data.startDate);
+                        //console.info(res.data.startDate);
                         //$(".top").val(res.data.top);
                         form.on('radio(top)', function(data){
                             console.log(data.elem); //得到radio原始DOM对象
@@ -182,12 +182,11 @@
                         });
                         $("[name=formtop][value='"+res.data.top+"']").attr("checked",true);
                         form.render('radio');
-
-                        $("#state").val(res.data.active);
-                        if($("#state").val() == "1"){
-                            $("#state").attr("checked",true);
+                        var active = $("input[name=active]").val(res.data.active).get(0).value;
+                        if(active=='1'){
+                            $("input[name=active]").attr("checked",true);
                         }else{
-                            $("#state").attr("checked",false);
+                            $("input[name=active]").attr("checked",false);
                         }
                         form.render('checkbox');
 
@@ -277,14 +276,17 @@
             var title = data.field.title,
                 imgid = data.field.imgid;
                 content = UE.getEditor('editor').getContent(),
-               // active =  data.field.switch == "on" ? "0" : "1",
-                active =  data.field.active == "on" ? "1" : "0",
+                //active =  data.field.active == 0 ? "1" : "0",
                 formtop = data.field.formtop,
                 describe = data.field.describe,
                 startTime = data.field.startTime,
                 endTime = data.field.endTime;
-                console.info(active);
-            //return;
+                //console.info(active);
+                if(data.field.active){
+                    active = "1";
+                }else{
+                    active = "0";
+                }
             $.ajax({
                 type:"post",
                 url:genAPI('wxDev/sellactivity/saveSellActivityContent'),

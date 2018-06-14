@@ -84,8 +84,8 @@
            <div class="layui-form-item">
                  <label class="layui-form-label">是否启用</label>
                  <div class="layui-input-block">
-                    <input type="checkbox" value="1" id="state" name="switch" lay-skin="switch" lay-text="启用|禁用" />
-                    <!--<input id="state" type="checkbox" name="state" lay-skin="switch" lay-text="启用|禁用"/>-->
+                   <!-- <input type="checkbox"  id="state" name="switch" lay-skin="switch" lay-text="启用|禁用" />-->
+                    <input type="checkbox" name="active" lay-skin="switch" lay-text="启用|禁用" >
                  </div>
             </div>
            <div class="layui-form-item">
@@ -277,12 +277,13 @@
             var title = data.field.title,
                 imgid = data.field.imgid;
                 content = UE.getEditor('editor').getContent(),
-                active =  data.field.switch == "" ? "0" : "1",
+               // active =  data.field.switch == "on" ? "0" : "1",
+                active =  data.field.active == "on" ? "1" : "0",
                 formtop = data.field.formtop,
                 describe = data.field.describe,
                 startTime = data.field.startTime,
                 endTime = data.field.endTime;
-            //自定义验证规则
+                console.info(active);
             //return;
             $.ajax({
                 type:"post",

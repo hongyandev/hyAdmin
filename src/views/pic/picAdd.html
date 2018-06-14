@@ -188,7 +188,7 @@
                     var title = data.field.title,
                         imgid = data.field.imgid;
                         content = UE.getEditor('editor').getContent(),
-                        active = data.field.state == "" ? "0" : "1",
+                        active = data.field.state == "on" ? "1" : "0",
                         order = parseInt(data.field.interest);
                     //自定义验证规则
                     form.verify({

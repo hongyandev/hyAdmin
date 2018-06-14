@@ -56,8 +56,11 @@
                 {field:'id',align:'center',title:'ID',width:80,},
                 {field:'picname',align:'center', title:'图片',width:120, templet: '<div><img src="{{d.fileRealPath}}?v={{Math.random()}}"></div>'},
                 {field:'title',align:'center', title:'活动名称'},
-                {field:'top',align:'center', title:'是否置顶',width:120,templet: function(d){
+                {field:'top',align:'center', title:'是否置顶',width:100,templet: function(d){
                         return d.top == 0 ? "否" : "是";
+                    }},
+                {field:'top',align:'center', title:'是否启用',width:100,templet: function(d){
+                        return d.active == 0 ? "否" : "是";
                     }},
                 {field:'opreate',align:'center', title:'操作',  toolbar: '#barDemo'}
             ]],

@@ -16,7 +16,7 @@
 
     <style>
     .layui-table img{max-width:100%;}
-    .layui-layer-dialog .layui-layer-content{padding:0 20px 0 0!important;}
+    /*.layui-layer-dialog .layui-layer-content{padding:0 20px 0 0!important;}*/
     .layui-table, .layui-table-view{margin:0!important;}
     .layui-btns{height:80px;line-height:80px;padding:0 4px;}
 </style>
@@ -39,30 +39,36 @@
     layui.use(['jquery','table','form','layer'],function(){
         var table = layui.table,
             layer = layui.layer,
+            $ = layui.$,
             form = layui.form;
 
         var tempArray = [];
         $(function () {
             $("#addActivity").attr("href", aLink('src/views/activity/addActive.html'));
+
         });
         table.render({
             elem: '#formTable',
             url:genAPI('/wxDev/sellactivity/getSellActivityListFenye'),
+            //url:'http://172.30.8.95:9999/wxDev/sellactivity/getSellActivityListFenye',
             method:'get',
             page: true,
             cols: [[
                 //{type:'numbers'},
                 //{type: 'checkbox'},
-                {field:'id',align:'center',title:'ID',width:80,},
-                {field:'picname',align:'center', title:'图片',width:120, templet: '<div><img src="{{d.fileRealPath}}?v={{Math.random()}}"></div>'},
-                {field:'title',align:'center', title:'活动名称'},
-                {field:'top',align:'center', title:'是否置顶',width:100,templet: function(d){
+                {field:'id',align:'center',title:'ID',width:80},
+                {field:'picname',align:'center', title:'图片',width:120, templet: '<div><img src="{{d.fileRealPath}}"></div>'},
+                {field:'title',align:'center', title:'活动名称',width:200},
+                {field:'top',align:'center', title:'是否置顶',width:90,templet: function(d){
                         return d.top == 1 ? "是" : "否";
                     }},
-                {field:'top',align:'center', title:'是否启用',width:100,templet: function(d){
+                /*{field:'top',align:'center', title:'是否启用',width:90,templet: function(d){
                         return d.active == 1 ? "是" : "否";
-                    }},
-                {field:'opreate',align:'center', title:'操作',  toolbar: '#barDemo'}
+                    }},*/
+                {field:'top',align:'center', title:'是否启用',width:90,templet: '#switchT',unresize: true },
+                {field:'fullRelease', title:'全国发布', width:90, templet: '#switchTpl', unresize: true},
+                {field:'opreate',align:'center', title:'操作',  toolbar: '#barDemo'},
+
             ]],
             request: {
                 pageName: 'page', //页码的参数名称，默认：page
@@ -167,13 +173,13 @@
                     second.splice(0,second.length);
                 }
             });
-        })
+        });
+
         table.on('tool(toolbar)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
             var data = obj.data; //获得当前行数据
             var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
             var tr = obj.tr; //获得当前行 tr 的DOM对象
             var id = data.id;
-
             if(layEvent === 'fabu'){ //发布
                 var first = layer.open({
                     type:1,
@@ -294,22 +300,22 @@
 
                 //console.info(h/2+"px");
             } else if(layEvent === 'del'){ //删除
-                layer.confirm('你确定要删除吗？', function(index){
+                layer.confirm('你确定要删除这条活动吗？', function(index){
                     obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
                     //向服务端发送删除指令
                     $.ajax({
                         url:genAPI('wxDev/sellactivity/deleteSellActivityById'),
                         type:"post",
                         data:{
-                            "id":id,
+                            "id":id
                         },
                         dataType:"json",
                         success:function (res) {
                             if(res.code == '00000'){
-                                layer.msg("已经删除成功", {
+                                layer.msg("删除成功", {
                                     time: 2000 //2秒关闭（如果不配置，默认是3秒）
                                 }, function(){
-                                    layer.close(second);
+                                    layer.close();
                                 });
                             }else{
                                 layer.msg(msg);
@@ -317,12 +323,8 @@
 
                         }
                     })
-
-
-
                 });
             } else if(layEvent === 'edit'){ //编辑
-                //do something
                 console.info(obj);
             } else if(layEvent === 'fabudx'){
                 var second = layer.open({
@@ -390,7 +392,115 @@
                 });
             }
         });
+        form.on('switch(fullRelease)', function(obj){
+            //var inpid = obj.elem.id;
+            var inpid = obj.value;
+            if(obj.elem.checked == true){
+                fullRelease = "1";
+                var confirm = layer.confirm('你确定要全国发布吗？', function(index){
+                    $.ajax({
+                        type:"post",
+                        url:genAPI('wxDev/sellactivity/modifyFullRelease'),
+                        //url:'http://172.30.8.95:9999/wxDev/sellactivity/modifyFullRelease',
+                        data:{
+                            fullRelease:fullRelease,
+                            id:inpid
+                        },
+                        dataType:'json',
+                        success:function (res) {
+                            if(res.code == '00000'){
+                                layer.close(confirm);
+                                table.reload('formTable');
 
+                            }else{
+                                layer.msg(res.msg);
+                            }
+
+                        }
+                    })
+
+                });
+            }else{
+                fullRelease = "0";
+                var confirm = layer.confirm('你确定要取消全国发布吗？', function(index){
+                    $.ajax({
+                        type:"post",
+                        url:genAPI('wxDev/sellactivity/modifyFullRelease'),
+                        //url:'http://172.30.8.95:9999/wxDev/sellactivity/modifyFullRelease',
+                        data:{
+                            fullRelease:fullRelease,
+                            id:inpid
+                        },
+                        dataType:'json',
+                        success:function (res) {
+                            if(res.code == '00000'){
+
+                                layer.close(confirm);
+                                table.reload('formTable');
+
+                            }else{
+                                layer.msg(res.msg);
+                            }
+
+                        }
+                    })
+
+                });
+            }
+        });
+        form.on('switch(active)',function (obj) {
+            var actid = obj.value;
+            if(obj.elem.checked == true){
+                active = "1"
+                $.ajax({
+                    url:genAPI('wxDev/sellactivity/modifyActive'),
+                    //url:'http://172.30.8.95:9999/wxDev/sellactivity/modifyActive',
+                    type:'post',
+                    data:{
+                        "id":actid,
+                        "active":active
+                    },
+                    dataType:"json",
+                    success:function (res) {
+                        if(res.code == '00000'){
+                            layer.msg("启用成功", {
+                                time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                            }, function(){
+                                layer.close();
+                            });
+                        }else{
+                            layer.msg(msg);
+                        }
+
+                    }
+                })
+            }else{
+                active = "0"
+                $.ajax({
+                    url:genAPI('wxDev/sellactivity/modifyActive'),
+                    //url:'http://172.30.8.95:9999/wxDev/sellactivity/modifyActive',
+                    type:'post',
+                    data:{
+                        "id":actid,
+                        "active":active
+                    },
+                    dataType:"json",
+                    success:function (res) {
+                        if(res.code == '00000'){
+                            layer.msg("关闭启用成功", {
+                                time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                            }, function(){
+                                layer.close();
+                            });
+                        }else{
+                            layer.msg(msg);
+                        }
+
+                    }
+                })
+            }
+
+        })
     });
 
 </script>
@@ -434,12 +544,25 @@
     </table>
 </div>
 <script type="text/html" id="barDemo">
-    <a class="layui-btn layui-btn-xs" lay-event="fabu">发布</a>
-    <a href="{{aLink('src/views/activity/addActive.html?id=')}}{{d.id}}" class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
-    <a class="layui-btn layui-btn-xs" lay-event="fabudx">已发布对象</a>
-</script>
+    {{#  if(d.fullRelease == 1){ }}
+        <a class="laybtn layui-btn layui-btn-xs layui-btn-disabled">发布</a>
+        <a href="{{aLink('src/views/activity/addActive.html?id=')}}{{d.id}}" class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+        <a class="laybtn layui-btn layui-btn-xs layui-btn-disabled">已发布对象</a>
+    {{#  }else{ }}
+        <a class="laybtn layui-btn layui-btn-xs" lay-event="fabu">发布</a>
+        <a href="{{aLink('src/views/activity/addActive.html?id=')}}{{d.id}}" class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+        <a class="laybtn layui-btn layui-btn-xs" lay-event="fabudx">已发布对象</a>
+    {{# } }}
 
+</script>
+<script type="text/html" id="switchT">
+    <input type="checkbox"  name="active" value="{{d.id}}" lay-skin="switch" lay-text="是|否" lay-filter="active" {{d.active == 1 ? 'checked' : ''}} >
+</script>
+<script type="text/html" id="switchTpl">
+    <input class="switch" type="checkbox" value="{{d.id}}" name="fullRelease" lay-skin="switch" lay-text="是|否" lay-filter="fullRelease" {{d.fullRelease == 1 ? 'checked' : ''}} >
+</script>
 </body>
 
 </html>

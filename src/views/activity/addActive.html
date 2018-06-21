@@ -145,6 +145,7 @@
             laydate = layui.laydate,
             upload = layui.upload,
             layer = layui.layer,
+            admin = layui.admin,
             form = layui.form;
         $(function () {
             function getQueryString(name){
@@ -197,12 +198,11 @@
             });
         });
 
-
-
         //上传图片
         upload.render({
             elem: '#uploadImg',
             url:genAPI('wxDev/sellactivity/saveSellActivityImage'),
+            //url:"http://172.30.8.95:9999/wxDev/sellactivity/saveSellActivityImage",
             //url: 'http://wxdev.hongyancloud.com/wxDev/ueditor/saveHomeImage',
             method:'post',
             filed:'file',
@@ -221,7 +221,7 @@
                     console.info(res);
                     layer.close(layer.msg('上传成功！'));
                     $(".layuiImg").addClass("layui-input-block");
-                    $(".imgview").attr("src",res.data.fileRealPath+'?v='+Math.random());
+                    $(".imgview").attr("src",res.data.fileRealPath);
                     $("#imgId").val(res.data.id)
                 }
 

@@ -420,6 +420,8 @@
                         }
                     })
 
+                },function () {
+                    table.reload('formTable');
                 });
             }else{
                 fullRelease = "0";
@@ -435,7 +437,6 @@
                         dataType:'json',
                         success:function (res) {
                             if(res.code == '00000'){
-
                                 layer.close(confirm);
                                 table.reload('formTable');
 
@@ -445,7 +446,8 @@
 
                         }
                     })
-
+                },function () {
+                    table.reload('formTable');
                 });
             }
         });

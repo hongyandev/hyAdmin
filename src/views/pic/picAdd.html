@@ -116,6 +116,7 @@
         <script>
             layui.use(['jquery','form','upload'], function(){
                 var $ = layui.$,
+                    admin = layui.admin,
                     form = layui.form;
                 var  upload = layui.upload;
                 $(function () {
@@ -156,6 +157,7 @@
                 upload.render({
                     elem: '#uploadImg',
                     url:genAPI('wxDev/homepage/saveHomeImage'),
+                    //url:"http://172.30.8.95:9999/wxDev/homepage/saveHomeImage",
                     //url: 'http://wxdev.hongyancloud.com/wxDev/homepage/saveHomeImage',
                     method:'post',
                     filed:'file',
@@ -173,8 +175,10 @@
                         if(res.code==00000){
                             console.info(res);
                             layer.close(layer.msg('上传成功！'));
-                            $(".imgview").attr("src",res.data.fileRealPath+'?v='+Math.random());
+                            $(".imgview").attr("src",res.data.fileRealPath);
                             $("#imgId").val(res.data.id)
+                        }else{
+                            layer.msg(res.msg);
                         }
 
                     },
